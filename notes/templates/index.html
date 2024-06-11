@@ -1,0 +1,59 @@
+{% extends 'base.html' %}  
+  
+{% block content %}
+    <div>
+        <p>You have visited this page {{ num_visits }}{% if num_visits == 1 %} time {% else %} times {% endif %}.</p>
+    </div>
+    <br>
+    <div style="margin-left: 10px">
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger">logout</button>
+        </form>
+    </div>
+    <br>
+    <div>  
+        <div class="row">  
+            {% for obj in page_obj %}  
+                <div class="card" style="width: 18rem; margin-left: 5px; margin-right: 5px">  
+                    <div class="card-body">  
+                        <div class="caption">  
+                            <h3 class="card-title">{{ obj.text }}</h3>  
+                            <p class="card-text">{{ obj.author.username }}</p>  
+                            <p class="card-text">{{ obj.created_at|date:"d/m/Y" }}</p>  
+                            {% if obj.author == request.user %}  
+                                <form method="post" action="{% url 'note-delete' obj.pk %}">  
+                                    {% csrf_token %}  
+                                    <input type="submit" class="btn btn-outline-danger" value="Delete">  
+                                </form>
+                            {% endif %}
+                        </div>  
+                    </div>  
+                </div>  
+            {% endfor %}  
+        </div>  
+    </div>  
+    <div class="pagination">  
+        <span class="step-links">  
+            {% if page_obj.has_previous %}  
+                <a href="?page=1">&laquo; first</a>  
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>  
+            {% endif %}  
+    
+            <span class="current">  
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.  
+            </span>  
+    
+            {% if page_obj.has_next %}  
+            <a href="?page={{ page_obj.next_page_number }}">next</a>  
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>  
+            {% endif %}  
+        </span>  
+    </div>  
+   </div>  
+    <form method="post" action="{% url 'note-create' %}">  
+  {% csrf_token %}  
+  {{ create_form }}  
+     <input type="submit" value="Create">  
+    </form>  
+{% endblock %}
